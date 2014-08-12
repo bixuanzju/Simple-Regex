@@ -16,9 +16,11 @@ extra-source-files:  README.md
 cabal-version:       >=1.10
 
 library
-  -- exposed-modules:     
+  exposed-modules:  Regx
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.7 && <4.8
+                     , mtl >= 2.1.3.1
+                     , parsec >= 3.1.5
   hs-source-dirs:      src
   default-language:    Haskell2010
