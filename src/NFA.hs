@@ -1,9 +1,9 @@
--- | NFA
+-- | Nonderministic Finite Automata
 
 module NFA
-      (
-      matches
-      ) where
+  (
+  matches
+  ) where
 
 import Control.Monad.State
 import Data.List (foldl')
@@ -48,7 +48,8 @@ ruleApplies c nfa r = maybe False (c ==) (inputChar r) &&
 stateClosure :: [Rule] -> [SID] -> [SID]
 stateClosure r cs = cs ++ go [] cs
   where go acc [] = acc
-        go acc ss = let ss' = followRules $ freeMoves r ss
+        go acc ss = let ss1 = followRules $ freeMoves r ss
+                        ss' = filter (`notElem` acc) ss1
                     in go (acc ++ ss') ss'
 
 freeMoves :: [Rule] -> [SID] -> [Rule]
