@@ -71,7 +71,7 @@ buildNFA :: Pattern -> SIDPool NFA
 buildNFA p =
   do s1 <- nextID
      case p of
-       Empty -> return $ NFA [] [s1] [s1]
+       EmptyR -> return $ NFA [] [s1] [s1]
        Literal c -> do s2 <- nextID
                        return $ NFA [Rule s1 (Just c) [s2]] [s1] [s2]
        Concat p1 p2 -> do nfa1 <- buildNFA p1
@@ -97,6 +97,8 @@ buildNFA p =
                        return $ NFA (initMove : rules nfa ++ lambdaMoves)
                                     [s2]
                                     (s2 : acceptStates nfa)
+       OneMore p' -> buildNFA (Concat p' (Repeat p'))
+       ZeroOne p' -> buildNFA (Choose EmptyR p')
   where freeMoveTo nfa s = Rule s Nothing (currentStates nfa)
 
 matches :: String -> String -> Bool
