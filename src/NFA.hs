@@ -2,12 +2,12 @@
 
 module NFA
   (
-  matches
+    matches
   ) where
 
-import Control.Monad.State
+import Control.Monad.State (State, evalState, get, put)
 import Data.List (foldl')
-import Data.Maybe
+import Data.Maybe (isNothing)
 
 import Regx
 
@@ -48,9 +48,10 @@ ruleApplies c nfa r = maybe False (c ==) (inputChar r) &&
 stateClosure :: [Rule] -> [SID] -> [SID]
 stateClosure r cs = cs ++ go [] cs
   where go acc [] = acc
-        go acc ss = let ss1 = followRules $ freeMoves r ss
-                        ss' = filter (`notElem` acc) ss1
-                    in go (acc ++ ss') ss'
+        go acc ss =
+          let ss1 = followRules $ freeMoves r ss
+              ss' = filter (`notElem` acc) ss1
+          in go (acc ++ ss') ss'
 
 freeMoves :: [Rule] -> [SID] -> [Rule]
 freeMoves rs ss = filter (\r ->

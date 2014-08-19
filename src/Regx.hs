@@ -1,3 +1,5 @@
+-- | Parse Regular Expression
+
 module Regx
   (
     Pattern(..)
@@ -9,11 +11,11 @@ import Text.Parsec.String
 
 data Pattern = EmptyR
              | Literal Char
-             | Concat Pattern Pattern
-             | Choose Pattern Pattern
-             | Repeat Pattern
-             | OneMore Pattern
-             | ZeroOne Pattern
+             | Concat Pattern Pattern -- ab
+             | Choose Pattern Pattern -- a|b
+             | Repeat Pattern -- a*
+             | OneMore Pattern -- a+
+             | ZeroOne Pattern -- a?
              deriving Show
 
 literal :: Parser Pattern
@@ -31,18 +33,21 @@ factor = do b <- base
             s <- many (oneOf "*+?")
             case s of
               [] -> return b
-              s -> return $ repeatStar s b
+              s' -> return $ repeatPattern s' b
 
-repeatStar :: String -> Pattern -> Pattern
-repeatStar (n:ns) p = foldl f acc ns
-  where f acc' n'
-          | n' == '+' = OneMore acc'
-          | n' == '*' = Repeat acc'
-          | n' == '?' = ZeroOne acc'
+repeatPattern :: String -> Pattern -> Pattern
+repeatPattern [] p = p
+repeatPattern (n:ns) p = foldl f acc ns
+  where f acc' n' = case n' of
+                      '+' -> OneMore acc'
+                      '*' -> Repeat acc'
+                      '?' -> ZeroOne acc'
+                      _ -> EmptyR
         acc = case n of
                 '+' -> OneMore p
                 '*' -> Repeat p
                 '?' -> ZeroOne p
+                _ -> EmptyR
 
 base :: Parser Pattern
 base = literal <|> (do char '('
